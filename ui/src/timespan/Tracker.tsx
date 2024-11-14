@@ -77,6 +77,25 @@ export const Tracker: React.FC<TrackerProps> = ({selectedEntries, onSelectedEntr
         }
     };
 
+    // Add a new submit function for the 25min timer
+    const submit25min = () => {
+        const tags = selectedEntries.map(
+            (entry: TagSelectorEntry): InputTimeSpanTag => ({key: entry.tag.key, value: entry.value})
+        );
+        
+        addTimeSpan({
+            variables: {
+                start: inUserTz(moment()).format(), 
+                end: inUserTz(moment().add(25, 'minutes')).format(),
+                tags,
+                note: ''
+            }
+        }).then(() => {
+            setSelectedEntries([]);
+            enqueueSnackbar('25 minute timer started', {variant: 'success'});
+        });
+    };
+
     return (
         <ClickAwayListener onClickAway={() => setOpenMenu(null)}>
             <Paper style={{display: 'flex', alignItems: 'center', padding: '10px'}}>
@@ -127,9 +146,14 @@ export const Tracker: React.FC<TrackerProps> = ({selectedEntries, onSelectedEntr
                         />
                     </div>
                 ) : null}
-                <Button variant="text" style={{height: 50}} onClick={submit}>
-                    {type === Type.Manual ? 'add' : 'start'}
-                </Button>
+                <div style={{display: 'flex', gap: '8px'}}>
+                    <Button variant="text" style={{height: 50}} onClick={submit}>
+                        {type === Type.Manual ? 'add' : 'start'}
+                    </Button>
+                    <Button variant="text" style={{height: 50}} onClick={submit25min}>
+                        start (25m)
+                    </Button>
+                </div>
                 <IconButton onClick={(e: React.MouseEvent<HTMLElement>) => setOpenMenu(e.currentTarget)}>
                     <MoreVert />
                 </IconButton>
